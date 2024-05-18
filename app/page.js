@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,21 +10,28 @@ import Head from 'next/head';
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [editTodo, setEditTodo] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const todos = useSelector((state) => state.todos.todos);
   const dispatch = useDispatch();
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const savedTodos = JSON.parse(localStorage.getItem('todos'));
-    if (savedTodos) {
+    const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+    if (savedTodos.length > 0) {
       savedTodos.forEach(todo => {
-        dispatch(addTodo(todo));
+        dispatch(addTodo({
+          ...todo
+        }));
       });
     }
+    setIsLoaded(true);
   }, [dispatch]);
 
   useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos));
-  }, [todos]);
+    if (isLoaded) {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+  }, [todos, isLoaded]);
 
   const handleAddClick = () => {
     setEditTodo(null);
@@ -36,6 +42,18 @@ export default function Home() {
     setEditTodo(todo);
     setShowModal(true);
   };
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filteredTodos = todos.filter(todo => 
+    todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    todo.desc.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (!isLoaded) {
+    return null; 
+  }
 
   return (
     <div className="container">
@@ -44,10 +62,16 @@ export default function Home() {
         <meta name="description" content="A simple to-do web application" />
       </Head>
       <h1>To-Do Web Application</h1>
-      <input type="text" placeholder="Search..." className="search-bar" />
+      <input 
+        type="text" 
+        placeholder="Search..." 
+        className="search-bar" 
+        value={searchQuery}
+        onChange={handleSearchChange}
+      />
       <button onClick={handleAddClick}>Add Note</button>
       <div className="todo-list">
-        {todos.map(todo => (
+        {filteredTodos.map(todo => (
           <TodoItem key={todo.id} todo={todo} onEdit={handleEditClick} />
         ))}
       </div>

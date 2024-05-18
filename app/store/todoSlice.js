@@ -2,8 +2,21 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 
+const loadState = () => {
+  try {
+    const serializedState = localStorage.getItem('todos');
+    if (serializedState === null) {
+      return [];
+    }
+    return JSON.parse(serializedState);
+  } catch (e) {
+    console.warn("Could not load state from localStorage", e);
+    return [];
+  }
+};
+
 const initialState = {
-  todos: [],
+  todos: loadState(),
 };
 
 const todoSlice = createSlice({
@@ -12,15 +25,18 @@ const todoSlice = createSlice({
   reducers: {
     addTodo: (state, action) => {
       state.todos.push(action.payload);
+      localStorage.setItem('todos', JSON.stringify(state.todos));
     },
     editTodo: (state, action) => {
       const index = state.todos.findIndex(todo => todo.id === action.payload.id);
       if (index !== -1) {
         state.todos[index] = action.payload;
+        localStorage.setItem('todos', JSON.stringify(state.todos));
       }
     },
     deleteTodo: (state, action) => {
       state.todos = state.todos.filter(todo => todo.id !== action.payload);
+      localStorage.setItem('todos', JSON.stringify(state.todos));
     },
   },
 });
