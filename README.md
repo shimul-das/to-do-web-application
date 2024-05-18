@@ -44,8 +44,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Searching To-Do Items
 1. Enter a keyword in the Search... input field.
 2. The list of to-do items will be filtered based on the keyword, matching the title and description.
-## Deploy on Vercel
+## Deployed on Vercel
 
 
 
-Check out our Website [https://to-do-web-application-nine.vercel.app/].
+Check Live Preview [https://to-do-web-application-nine.vercel.app/].
